@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>3D Streamlines</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"
+    />
+    <style type="text/css">
+      body {
+        background-color: #f0f0f0;
+        margin: 0px;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="module">
+      import { PerspectiveCamera, Scene, WebGLRenderer } from "https://unpkg.com/three/build/three.module.js";
+      import { StreamLines } from "https://unpkg.com/3dstreamlines@1.0.18";
+
+      let camera, scene, renderer;
+      let geometry, material, mesh;
+
+      //var test = StreamLines()
+
+      init();
+
+      function init() {
+        camera = new PerspectiveCamera(
+          70,
+          window.innerWidth / window.innerHeight,
+          0.01,
+          10
+        );
+        camera.position.z = 1;
+
+        scene = new Scene();
+
+        renderer = new WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setAnimationLoop(animation);
+
+        document.body.appendChild(renderer.domElement);
+
+        axios
+          .get(
+            "https://3dstreamlines.s3.eu-central-1.amazonaws.com/tornado.json"
+          )
+          .then((result) => {
+            new StreamLines(result.data.grid, result.data.bounds, scene);
+          });
+      }
+
+      function animation(time) {
+        
+        renderer.render(scene, camera);
+      }
+    </script>
+  </body>
+</html>
